@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.control.ListView?>
+<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.client.controller.MainController">
+    <MenuBar>
+        <Menu text="Программа">
+            <MenuItem text="Выход" onAction="#onExitAction"/>
+        </Menu>
+    </MenuBar>
+    <HBox>
+        <Button text="Подключиться" onAction="#connectServer"/>
+    </HBox>
+    <HBox>
+        <TextField fx:id="commandField" HBox.hgrow="ALWAYS" promptText="Введите команду..." onAction="#sendCommand"/>
+        <Button text="Отправить" onAction="#sendCommand"/>
+    </HBox>
+    <!--Путь к файлам-->
+    <HBox>
+        <TextField fx:id="hostPath"></TextField>
+        <Button text="Назад" HBox.hgrow="ALWAYS" onAction="#onBackHost"/>
+        <TextField fx:id="serverPath"/>
+        <Button text="Назад" alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS"/>
+    </HBox>
+    <!--Список файлов клиент сервер-->
+    <HBox>
+        <ListView fx:id="hostFileList" HBox.hgrow="ALWAYS" onMouseClicked="#enterToDir">
+
+        </ListView>
+        <VBox>
+            <Button text="Кнопаки" prefWidth="150.0"></Button>
+        </VBox>
+        <ListView fx:id="serverFileList" HBox.hgrow="ALWAYS" onMouseClicked="#enterToDirServer">
+
+        </ListView>
+    </HBox>
+
+    <HBox>
+        <Button text="Загрузить" HBox.hgrow="ALWAYS" onAction="#uploadOnServer"/>
+        <Button text="Выгрузить" HBox.hgrow="ALWAYS"/>
+        <Button text="Удалить" HBox.hgrow="ALWAYS"/>
+    </HBox>
+</VBox>

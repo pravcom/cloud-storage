@@ -6,13 +6,14 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import org.akhtyamov.Action;
 import org.akhtyamov.Commands;
+import org.akhtyamov.files.PartFile;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -30,8 +31,6 @@ public class MainController implements Initializable {
     private ClientNetwork clientNetwork;
     @FXML
     private TextField commandField;
-    @FXML
-    private TextArea mainArea;
     @FXML
     private ListView<String> hostFileList;
     @FXML
@@ -59,7 +58,15 @@ public class MainController implements Initializable {
     }
 
     public void uploadOnServer(ActionEvent actionEvent) {
-        clientNetwork.sendCommand("/upload", commandField.getText());
+        Path file = Paths.get(hostPath.getText());
+        try (FileInputStream fis = new FileInputStream(file.toFile())) {
+            byte[] buffer = new byte[256];
+            //считываем буфер
+            fis.read(buffer);
+            clientNetwork.getChannel().writeAndFlush(new PartFile(buffer, getSelectedHostItem()));
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     /**
@@ -134,11 +141,21 @@ public class MainController implements Initializable {
 
         }
     }
-    public void doubleClickServer(){
+
+    public void doubleClickServer() {
         if (currentFileOnServer.isDirectory()) {
             clientNetwork.getChannel().writeAndFlush(new Action(serverPath.getText(), Commands.DOUBLE_CLICK_FILE));
             serverDir = Path.of(serverPath.getText());
         }
+    }
+
+    /**
+     * Кнопка "Назад" для сервера
+     *
+     * @param actionEvent
+     */
+    public void onBackServer(ActionEvent actionEvent) {
+        clientNetwork.getChannel().writeAndFlush(new Action("", Commands.BACK));
     }
 
     private String getSelectedServerItem() {
@@ -194,4 +211,6 @@ public class MainController implements Initializable {
             serverPath.setText(serverDir.toString());
         });
     }
+
+
 }

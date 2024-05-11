@@ -29,10 +29,10 @@
     </HBox>
     <!--Путь к файлам-->
     <HBox>
-        <TextField fx:id="hostPath"></TextField>
+        <TextField fx:id="hostPath" HBox.hgrow="ALWAYS"/>
         <Button text="Назад" HBox.hgrow="ALWAYS" onAction="#onBackHost"/>
-        <TextField fx:id="serverPath"/>
-        <Button text="Назад" alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS"/>
+        <TextField fx:id="serverPath" HBox.hgrow="ALWAYS"/>
+        <Button text="Назад" alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS" onAction="#onBackServer"/>
     </HBox>
     <!--Список файлов клиент сервер-->
     <HBox>
@@ -40,16 +40,12 @@
 
         </ListView>
         <VBox>
-            <Button text="Кнопаки" prefWidth="150.0"></Button>
+            <Button text="Загрузить" HBox.hgrow="ALWAYS" onAction="#uploadOnServer"/>
+            <Button text="Выгрузить" HBox.hgrow="ALWAYS"/>
+            <Button text="Удалить" HBox.hgrow="ALWAYS"/>
         </VBox>
         <ListView fx:id="serverFileList" HBox.hgrow="ALWAYS" onMouseClicked="#enterToDirServer">
 
         </ListView>
-    </HBox>
-
-    <HBox>
-        <Button text="Загрузить" HBox.hgrow="ALWAYS" onAction="#uploadOnServer"/>
-        <Button text="Выгрузить" HBox.hgrow="ALWAYS"/>
-        <Button text="Удалить" HBox.hgrow="ALWAYS"/>
     </HBox>
 </VBox>

@@ -1,7 +1,6 @@
 package com.example.client.controller;
 
 import com.example.client.ClientNetwork;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -10,10 +9,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import org.akhtyamov.Action;
 import org.akhtyamov.Commands;
-import org.akhtyamov.files.PartFile;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -22,21 +19,22 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
-
 public class MainController implements Initializable {
-    private static final String sourceRoot = "client/client";
+    public static final String sourceRoot = "client/client";
     public File currentFileOnServer;
-    private Path hostDir;
-    private Path serverDir;
-    private ClientNetwork clientNetwork;
+    public Path hostDir;
+    public Path serverDir;
+    public ClientNetwork clientNetwork;
+    private HostController hostController;
+    private ServerController serverController;
     @FXML
     private TextField commandField;
     @FXML
-    private ListView<String> hostFileList;
+    public ListView<String> hostFileList;
     @FXML
-    private TextField hostPath;
+    public TextField hostPath;
     @FXML
-    private TextField serverPath;
+    public TextField serverPath;
     @FXML
     public ListView serverFileList;
 
@@ -48,81 +46,38 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        hostDir = Paths.get(sourceRoot);
-        hostFileList.getItems().addAll(getFiles(hostDir));
-        hostPath.setText(hostDir.toString());
+        hostController = new HostController(this);
+        serverController = new ServerController(this);
+        hostController.initialize();
+
     }
 
     public void onExitAction(ActionEvent actionEvent) {
         clientNetwork.close();
     }
 
-    public void uploadOnServer(ActionEvent actionEvent) {
-        Path file = Paths.get(hostPath.getText());
-        try (FileInputStream fis = new FileInputStream(file.toFile())) {
-            byte[] buffer = new byte[256];
-            //считываем буфер
-            fis.read(buffer);
-            clientNetwork.getChannel().writeAndFlush(new PartFile(buffer, getSelectedHostItem()));
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
     /**
-     * Получаем список вложеннных файлов на клиенте
-     *
-     * @param path
-     * @return
+     * Загрузка "Клиент --> Сервер"
+     * @param actionEvent
      */
-    public List<String> getFiles(Path path) {
-        try {
-            return Files.list(path)
-                    .map(p -> p.getFileName().toString())
-                    .collect(Collectors.toList());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public void uploadOnServer(ActionEvent actionEvent) {
+        hostController.upload();
     }
-
     /**
      * Событие по щелчку на списке файлов клиента
      *
      * @param mouseEvent
      */
     public void enterToDir(MouseEvent mouseEvent) {
-        if (mouseEvent.getClickCount() == 2) {
-            if (Paths.get(hostPath.getText()).toFile().isDirectory()) {
-                doubleClickClient();
-            }
-        } else if (mouseEvent.getClickCount() == 1) {
-
-            hostPath.setText(hostDir.toString() + File.separator + getSelectedHostItem());
-
-        }
+        hostController.enterToDir(mouseEvent);
     }
-
-    /**
-     * Проваливание в папку
-     */
-    private void doubleClickClient() {
-        hostFileList.getItems().clear();
-        hostFileList.getItems().addAll(getFiles(Paths.get(hostPath.getText())));
-        hostDir = Path.of(hostPath.getText());
-    }
-
     /**
      * Кнопка "Назад" хост
      *
      * @param actionEvent
      */
     public void onBackHost(ActionEvent actionEvent) {
-        if (!hostDir.equals(Paths.get(sourceRoot))) {
-            hostFileList.getItems().clear();
-            hostFileList.getItems().addAll(getFiles(hostDir.getParent()));
-            hostDir = hostDir.getParent();
-            hostPath.setText(hostDir.toString());
-        }
+        hostController.onBack();
     }
 
     /**
@@ -131,22 +86,11 @@ public class MainController implements Initializable {
      * @param mouseEvent
      */
     public void enterToDirServer(MouseEvent mouseEvent) {
-        if (mouseEvent.getClickCount() == 2) {
-            //Делаем запрос на сервер, чтобы проверить в дальнейшем, что выбранный файл "папка"
-            clientNetwork.getChannel().writeAndFlush(new Action(getSelectedServerItem(), Commands.GET_CURRENT_FILE));
-        } else if (mouseEvent.getClickCount() == 1) {
-
-            serverPath.setText(serverDir.toString() + File.separator + getSelectedServerItem());
-
-
-        }
+        serverController.enterToDir(mouseEvent);
     }
 
     public void doubleClickServer() {
-        if (currentFileOnServer.isDirectory()) {
-            clientNetwork.getChannel().writeAndFlush(new Action(serverPath.getText(), Commands.DOUBLE_CLICK_FILE));
-            serverDir = Path.of(serverPath.getText());
-        }
+        serverController.doubleClick();
     }
 
     /**
@@ -155,22 +99,8 @@ public class MainController implements Initializable {
      * @param actionEvent
      */
     public void onBackServer(ActionEvent actionEvent) {
-        clientNetwork.getChannel().writeAndFlush(new Action("", Commands.BACK));
+        serverController.onBack();
     }
-
-    private String getSelectedServerItem() {
-        return (String) serverFileList.getSelectionModel().getSelectedItem();
-    }
-
-    /**
-     * Получаем имя выбранного элемента на клиенте
-     *
-     * @return
-     */
-    public String getSelectedHostItem() {
-        return hostFileList.getSelectionModel().getSelectedItem();
-    }
-
     /**
      * Инициализирующий поток, который возвращает содержимое корневой папки сервера
      */
@@ -206,10 +136,7 @@ public class MainController implements Initializable {
      * @param serverDirPath
      */
     public void setServerDirName(Path serverDirPath) {
-        serverDir = serverDirPath;
-        Platform.runLater(() -> {
-            serverPath.setText(serverDir.toString());
-        });
+        serverController.setDirName(serverDirPath);
     }
 
 

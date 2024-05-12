@@ -1,13 +1,15 @@
 package com.example.client.controller;
 
-import javafx.event.ActionEvent;
+import javafx.scene.input.MouseEvent;
+
+import java.nio.file.Path;
+import java.util.List;
 
 public interface ButtonActionFileList {
     public void upload();
-    public void getFiles();
-    public void enterToDir();
-    public void doubleClickClient();
+    public void enterToDir(MouseEvent mouseEvent);
+    public void doubleClick();
     public void onBack();
-    public void getSelectedItem();
+    public String getSelectedItem();
 
 }

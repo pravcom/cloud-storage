@@ -1,17 +1,27 @@
 package com.example.client.controller;
 
+import javafx.scene.input.MouseEvent;
 import org.akhtyamov.files.PartFile;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
 
-public class HostController implements ButtonActionFileList{
+public class HostController implements ButtonActionFileList {
     private final MainController mainController;
 
     public HostController(MainController mainController) {
         this.mainController = mainController;
+    }
+    public void initialize() {
+        mainController.hostDir = Paths.get(mainController.sourceRoot);
+        mainController.hostFileList.getItems().addAll(getFiles(mainController.hostDir));
+        mainController.hostPath.setText(mainController.hostDir.toString());
     }
 
     @Override
@@ -27,28 +37,49 @@ public class HostController implements ButtonActionFileList{
         }
     }
 
-    @Override
-    public void getFiles() {
+    public List<String> getFiles(Path path) {
+        try {
+            return Files.list(path)
+                    .map(p -> p.getFileName().toString())
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
+
+    @Override
+    public void enterToDir(MouseEvent mouseEvent) {
+        if (mouseEvent.getClickCount() == 2) {
+            if (Paths.get(mainController.hostPath.getText()).toFile().isDirectory()) {
+                doubleClick();
+            }
+        } else if (mouseEvent.getClickCount() == 1) {
+
+            mainController.hostPath.setText(mainController.hostDir.toString() + File.separator + getSelectedItem());
+
+        }
     }
 
     @Override
-    public void enterToDir() {
-
-    }
-
-    @Override
-    public void doubleClickClient() {
-
+    public void doubleClick() {
+        mainController.hostFileList.getItems().clear();
+        mainController.hostFileList.getItems().addAll(getFiles(Paths.get(mainController.hostPath.getText())));
+        mainController.hostDir = Path.of(mainController.hostPath.getText());
     }
 
     @Override
     public void onBack() {
-
+        if (!mainController.hostDir.equals(Paths.get(mainController.sourceRoot))) {
+            mainController.hostFileList.getItems().clear();
+            mainController.hostFileList.getItems().addAll(getFiles(mainController.hostDir.getParent()));
+            mainController.hostDir = mainController.hostDir.getParent();
+            mainController.hostPath.setText(mainController.hostDir.toString());
+        }
     }
 
     @Override
-    public void getSelectedItem() {
-        return hostFileList.getSelectionModel().getSelectedItem();
+    public String getSelectedItem() {
+        return mainController.hostFileList.getSelectionModel().getSelectedItem();
     }
 }

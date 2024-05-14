@@ -10,10 +10,10 @@ import javafx.stage.WindowEvent;
 
 import java.io.IOException;
 
-public class HelloApplication extends Application {
+public class Client extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(Client.class.getResource("hello-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 300);
         stage.setTitle("Client!");
         stage.setScene(scene);

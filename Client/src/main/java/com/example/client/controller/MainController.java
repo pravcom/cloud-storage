@@ -19,6 +19,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+
 public class MainController implements Initializable {
     public static final String sourceRoot = "client/client";
     public File currentFileOnServer;
@@ -58,11 +59,21 @@ public class MainController implements Initializable {
 
     /**
      * Загрузка "Клиент --> Сервер"
+     *
      * @param actionEvent
      */
     public void uploadOnServer(ActionEvent actionEvent) {
-        hostController.upload();
+        if (isSelected(hostFileList)) {
+            hostController.upload();
+        }
+
     }
+
+    public void delete() {
+        if (isSelected(hostFileList)) hostController.delete();
+        if (isSelected(serverFileList)) serverController.delete();
+    }
+
     /**
      * Событие по щелчку на списке файлов клиента
      *
@@ -71,6 +82,7 @@ public class MainController implements Initializable {
     public void enterToDir(MouseEvent mouseEvent) {
         hostController.enterToDir(mouseEvent);
     }
+
     /**
      * Кнопка "Назад" хост
      *
@@ -101,6 +113,7 @@ public class MainController implements Initializable {
     public void onBackServer(ActionEvent actionEvent) {
         serverController.onBack();
     }
+
     /**
      * Инициализирующий поток, который возвращает содержимое корневой папки сервера
      */
@@ -139,5 +152,15 @@ public class MainController implements Initializable {
         serverController.setDirName(serverDirPath);
     }
 
-
+    static boolean isSelected(ListView listView) {
+        int size = listView.getItems().size();
+        boolean isSelected = false;
+        for (int i = 0; i < size; i++) {
+            if (listView.getSelectionModel().isSelected(i)) {
+                isSelected = true;
+                break;
+            }
+        }
+        return isSelected;
+    }
 }

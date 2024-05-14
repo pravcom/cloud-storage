@@ -1,6 +1,7 @@
 package com.example.client.controller;
 
 import javafx.application.Platform;
+import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
 import org.akhtyamov.Action;
 import org.akhtyamov.Commands;
@@ -21,12 +22,19 @@ public class ServerController implements ButtonActionFileList{
     }
 
     @Override
+    public void delete() {
+        mainController.clientNetwork.getChannel()
+                .writeAndFlush(new Action(mainController.serverPath.getText(),Commands.DELETE_SERVER_FILE));
+    }
+
+    @Override
     public void enterToDir(MouseEvent mouseEvent) {
         if (mouseEvent.getClickCount() == 2) {
             //Делаем запрос на сервер, чтобы проверить в дальнейшем, что выбранный файл "папка"
             mainController.clientNetwork.getChannel().writeAndFlush(new Action(getSelectedItem(), Commands.GET_CURRENT_FILE));
         } else if (mouseEvent.getClickCount() == 1) {
             mainController.serverPath.setText(mainController.serverDir.toString() + File.separator + getSelectedItem());
+            mainController.hostFileList.getSelectionModel().clearSelection();
         }
     }
 
@@ -47,6 +55,7 @@ public class ServerController implements ButtonActionFileList{
     public String getSelectedItem() {
         return (String) mainController.serverFileList.getSelectionModel().getSelectedItem();
     }
+
     public void setDirName(Path serverDirPath) {
         mainController.serverDir = serverDirPath;
         Platform.runLater(() -> {

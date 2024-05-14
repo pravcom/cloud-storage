@@ -4,7 +4,9 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.akhtyamov.*;
+import org.akhtyamov.Action;
+import org.akhtyamov.Commands;
+import org.akhtyamov.MessageExchange;
 import org.akhtyamov.files.FileList;
 import org.akhtyamov.files.FileName;
 import org.akhtyamov.files.PartFile;
@@ -16,7 +18,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -88,7 +89,6 @@ public class ServerHandler extends SimpleChannelInboundHandler<MessageExchange> 
             }
             case GET_CURRENT_FILE -> {
                 System.out.println(Commands.GET_CURRENT_FILE + "-->" + LocalTime.now());
-
                 getFile(message);
             }
             case BACK -> {
@@ -99,8 +99,17 @@ public class ServerHandler extends SimpleChannelInboundHandler<MessageExchange> 
                     sendDirName();
                 }
             }
+            case DELETE_SERVER_FILE -> {
+                System.out.println(Commands.DELETE_SERVER_FILE + "-->" + LocalTime.now());
+                delete(message);
+                sendFileList(ctx,userRootDir, message);
+            }
         }
 
+    }
+
+    private void delete(MessageExchange message) {
+        Paths.get((String) message.getMessage()).toFile().delete();
     }
 
     private void sendDirName() {
@@ -116,12 +125,6 @@ public class ServerHandler extends SimpleChannelInboundHandler<MessageExchange> 
      */
     private void sendFileList(ChannelHandlerContext ctx, Path currentDir, MessageExchange message) {
         try {
-//            String finalFileMask = String.valueOf(message.getMessage()).trim();
-//            List<String> lists = Files.list(currentDir)
-//                    .map(p -> p.getFileName().toString())
-//                    .filter(fileName -> fileName.contains(finalFileMask))
-//                    .collect(Collectors.toList());
-
             List<String> lists = Files.list(currentDir)
                     .map(p -> p.getFileName().toString())
                     .collect(Collectors.toList());

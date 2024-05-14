@@ -1,5 +1,6 @@
 package com.example.client.controller;
 
+import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
 import org.akhtyamov.files.PartFile;
 
@@ -18,6 +19,7 @@ public class HostController implements ButtonActionFileList {
     public HostController(MainController mainController) {
         this.mainController = mainController;
     }
+
     public void initialize() {
         mainController.hostDir = Paths.get(mainController.sourceRoot);
         mainController.hostFileList.getItems().addAll(getFiles(mainController.hostDir));
@@ -26,15 +28,22 @@ public class HostController implements ButtonActionFileList {
 
     @Override
     public void upload() {
-        Path file = Paths.get(mainController.hostPath.getText());
-        try (FileInputStream fis = new FileInputStream(file.toFile())) {
-            byte[] buffer = new byte[256];
-            //считываем буфер
-            fis.read(buffer);
-            mainController.clientNetwork.getChannel().writeAndFlush(new PartFile(buffer, getSelectedItem()));
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
+            Path file = Paths.get(mainController.hostPath.getText());
+            try (FileInputStream fis = new FileInputStream(file.toFile())) {
+                byte[] buffer = new byte[fis.available()];
+                //считываем буфер
+                fis.read(buffer);
+                mainController.clientNetwork.getChannel().writeAndFlush(new PartFile(buffer, getSelectedItem()));
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+    }
+
+    @Override
+    public void delete() {
+        Paths.get(mainController.hostPath.getText()).toFile().delete();
+        mainController.hostFileList.getItems().clear();
+        mainController.hostFileList.getItems().addAll(getFiles(mainController.hostDir));
     }
 
     public List<String> getFiles(Path path) {
@@ -55,9 +64,8 @@ public class HostController implements ButtonActionFileList {
                 doubleClick();
             }
         } else if (mouseEvent.getClickCount() == 1) {
-
             mainController.hostPath.setText(mainController.hostDir.toString() + File.separator + getSelectedItem());
-
+            mainController.serverFileList.getSelectionModel().clearSelection();
         }
     }
 

@@ -9,6 +9,7 @@ public enum Commands {
     SELECTED_FILE_SERVER,
     DOUBLE_CLICK_FILE,
     GET_CURRENT_FILE,
-    BACK
+    BACK,
+    DELETE_SERVER_FILE
 
 }

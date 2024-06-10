@@ -69,9 +69,21 @@ public class MainController implements Initializable {
 
     }
 
+    /**
+     * Выгрузка "Сервер --> Клиент"
+     */
+    public void uploadOnHost() {
+        if (isSelected(serverFileList))
+            serverController.upload();
+    }
+
     public void delete() {
         if (isSelected(hostFileList)) hostController.delete();
         if (isSelected(serverFileList)) serverController.delete();
+    }
+    public void copy(ActionEvent actionEvent) {
+        if (isSelected(hostFileList)) hostController.copy();
+        if (isSelected(serverFileList)) serverController.copy();
     }
 
     /**
@@ -162,5 +174,20 @@ public class MainController implements Initializable {
             }
         }
         return isSelected;
+    }
+
+    public void updateHostListView(Path path) {
+        hostFileList.getItems().clear();
+        hostFileList.getItems().addAll(getFiles(path));
+    }
+
+    static List<String> getFiles(Path path) {
+        try {
+            return Files.list(path)
+                    .map(p -> p.getFileName().toString())
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

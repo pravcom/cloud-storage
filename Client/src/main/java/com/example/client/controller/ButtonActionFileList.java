@@ -13,6 +13,7 @@ public interface ButtonActionFileList {
     public void onBack();
     public String getSelectedItem();
     public void delete();
+    public void copy();
 
 
 

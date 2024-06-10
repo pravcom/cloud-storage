@@ -12,6 +12,7 @@ import org.akhtyamov.files.FileName;
 import org.akhtyamov.files.PartFile;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -53,8 +54,16 @@ public class ServerHandler extends SimpleChannelInboundHandler<MessageExchange> 
         System.out.println(message.getType());
 
         switch (message.getType()) {
+            case COPY_SERVER_FILE -> {
+                System.out.println(Commands.COPY_SERVER_FILE + "-->" + LocalTime.now());
+                copyFile(message);
+                sendFileList(ctx, userRootDir);
+            }
             case DOWNLOAD -> {
 
+            }
+            case UPLOAD_ON_HOST -> {
+                uploadOnHost(message);
             }
             case FILE -> {
                 PartFile partFile = (PartFile) message;
@@ -63,7 +72,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<MessageExchange> 
                 byte[] fileBytes = (byte[]) partFile.getMessage();
                 try {
                     Files.write(path, fileBytes, StandardOpenOption.CREATE, StandardOpenOption.SYNC, StandardOpenOption.APPEND);
-                    sendFileList(ctx, userRootDir, message);
+                    sendFileList(ctx, userRootDir);
                 } catch (IOException e) {
                     System.out.println("Ошибка на принятие файла: " + e.getMessage());
                 }
@@ -72,7 +81,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<MessageExchange> 
             case GET_FILE_LIST -> {
                 System.out.println(Commands.GET_FILE_LIST + "-->" + LocalTime.now());
 
-                sendFileList(ctx, userRootDir, message);
+                sendFileList(ctx, userRootDir);
             }
             case GET_SERVER_DIR_NAME -> {
                 System.out.println(Commands.GET_SERVER_DIR_NAME + "-->" + LocalTime.now());
@@ -85,7 +94,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<MessageExchange> 
                 System.out.print(LocalTime.now());
 
                 userRootDir = Paths.get((String) message.getMessage());
-                sendFileList(ctx, userRootDir, message);
+                sendFileList(ctx, userRootDir);
             }
             case GET_CURRENT_FILE -> {
                 System.out.println(Commands.GET_CURRENT_FILE + "-->" + LocalTime.now());
@@ -95,17 +104,50 @@ public class ServerHandler extends SimpleChannelInboundHandler<MessageExchange> 
                 System.out.println(Commands.BACK + "-->" + LocalTime.now());
                 if (!userRootDir.equals(Paths.get(sourceRoot))) {
                     userRootDir = userRootDir.getParent();
-                    sendFileList(ctx, userRootDir, message);
+                    sendFileList(ctx, userRootDir);
                     sendDirName();
                 }
             }
             case DELETE_SERVER_FILE -> {
                 System.out.println(Commands.DELETE_SERVER_FILE + "-->" + LocalTime.now());
                 delete(message);
-                sendFileList(ctx,userRootDir, message);
+                sendFileList(ctx, userRootDir);
             }
         }
 
+    }
+
+    private void copyFile(MessageExchange message) {
+        Path file = Paths.get((String) message.getMessage());
+        try {
+            Integer count = 0;
+            Path fileName = Paths.get((String) message.getMessage());
+
+            while (Files.exists(fileName)) {
+                count++;
+                fileName = Paths.get(userRootDir + File.separator +
+                        "Copy" +
+                        count +
+                        "_" +
+                        file.getFileName());
+            }
+
+            Files.copy(file, fileName);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void uploadOnHost(MessageExchange message) {
+        File file = Paths.get((String) message.getMessage()).toFile();
+        try (FileInputStream fis = new FileInputStream(file)) {
+            byte[] buffer = new byte[fis.available()];
+            //считываем буфер
+            fis.read(buffer);
+            channel.writeAndFlush(new PartFile(buffer, file.getName()));
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void delete(MessageExchange message) {
@@ -121,9 +163,9 @@ public class ServerHandler extends SimpleChannelInboundHandler<MessageExchange> 
      *
      * @param ctx
      * @param currentDir
-     * @param message
+     * @param
      */
-    private void sendFileList(ChannelHandlerContext ctx, Path currentDir, MessageExchange message) {
+    private void sendFileList(ChannelHandlerContext ctx, Path currentDir) {
         try {
             List<String> lists = Files.list(currentDir)
                     .map(p -> p.getFileName().toString())

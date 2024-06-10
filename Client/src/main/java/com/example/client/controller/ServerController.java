@@ -18,13 +18,18 @@ public class ServerController implements ButtonActionFileList{
 
     @Override
     public void upload() {
-
+        mainController.clientNetwork.getChannel().writeAndFlush(new Action(mainController.serverPath.getText(),Commands.UPLOAD_ON_HOST));
     }
 
     @Override
     public void delete() {
         mainController.clientNetwork.getChannel()
                 .writeAndFlush(new Action(mainController.serverPath.getText(),Commands.DELETE_SERVER_FILE));
+    }
+
+    @Override
+    public void copy() {
+        mainController.clientNetwork.getChannel().writeAndFlush(new Action(mainController.serverPath.getText(),Commands.COPY_SERVER_FILE));
     }
 
     @Override

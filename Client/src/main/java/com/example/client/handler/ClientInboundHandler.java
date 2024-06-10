@@ -7,10 +7,15 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import javafx.application.Platform;
 import org.akhtyamov.MessageExchange;
+import org.akhtyamov.files.PartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 public class ClientInboundHandler extends SimpleChannelInboundHandler<MessageExchange> {
@@ -43,6 +48,9 @@ public class ClientInboundHandler extends SimpleChannelInboundHandler<MessageExc
         System.out.println("Сообщение пришло: " + message.getType());
 
         switch (message.getType()) {
+            case FILE -> {
+                getFileFromServer(message);
+            }
             case LIST_FILE -> {
                 updateServerFileList(message);
             }
@@ -53,6 +61,19 @@ public class ClientInboundHandler extends SimpleChannelInboundHandler<MessageExc
                 mainController.currentFileOnServer = (File) message.getMessage();
                 mainController.doubleClickServer();
             }
+        }
+    }
+
+    private void getFileFromServer(MessageExchange message) {
+        PartFile partFile = (PartFile) message;
+        Path path = Path.of(mainController.hostDir + File.separator + partFile.getFilename());
+
+        byte[] fileBytes = (byte[]) partFile.getMessage();
+        try {
+            Files.write(path, fileBytes, StandardOpenOption.CREATE, StandardOpenOption.SYNC, StandardOpenOption.APPEND);
+            mainController.updateHostListView(mainController.hostDir);
+        } catch (IOException e) {
+            System.out.println("Ошибка на принятие файла: " + e.getMessage());
         }
     }
 

@@ -22,37 +22,50 @@ public class HostController implements ButtonActionFileList {
 
     public void initialize() {
         mainController.hostDir = Paths.get(mainController.sourceRoot);
-        mainController.hostFileList.getItems().addAll(getFiles(mainController.hostDir));
+        mainController.updateHostListView(mainController.hostDir);
+//        mainController.hostFileList.getItems().addAll(getFiles(mainController.hostDir));
         mainController.hostPath.setText(mainController.hostDir.toString());
     }
 
     @Override
     public void upload() {
-            Path file = Paths.get(mainController.hostPath.getText());
-            try (FileInputStream fis = new FileInputStream(file.toFile())) {
-                byte[] buffer = new byte[fis.available()];
-                //считываем буфер
-                fis.read(buffer);
-                mainController.clientNetwork.getChannel().writeAndFlush(new PartFile(buffer, getSelectedItem()));
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
-            }
+        Path file = Paths.get(mainController.hostPath.getText());
+        try (FileInputStream fis = new FileInputStream(file.toFile())) {
+            byte[] buffer = new byte[fis.available()];
+            //считываем буфер
+            fis.read(buffer);
+            mainController.clientNetwork.getChannel().writeAndFlush(new PartFile(buffer, getSelectedItem()));
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @Override
     public void delete() {
         Paths.get(mainController.hostPath.getText()).toFile().delete();
-        mainController.hostFileList.getItems().clear();
-        mainController.hostFileList.getItems().addAll(getFiles(mainController.hostDir));
+        mainController.updateHostListView(mainController.hostDir);
     }
 
-    public List<String> getFiles(Path path) {
+    @Override
+    public void copy() {
+        Path file = Paths.get(mainController.hostPath.getText());
         try {
-            return Files.list(path)
-                    .map(p -> p.getFileName().toString())
-                    .collect(Collectors.toList());
+            Integer count = 0;
+            Path fileName = Paths.get(mainController.hostPath.getText());
+
+            while (Files.exists(fileName)) {
+                count++;
+                fileName = Paths.get(mainController.hostDir.toString() + File.separator +
+                        "Copy" +
+                        count +
+                        "_" +
+                        getSelectedItem());
+            }
+
+            Files.copy(file, fileName);
+            mainController.updateHostListView(mainController.hostDir);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println(e.getMessage());
         }
     }
 
@@ -71,16 +84,14 @@ public class HostController implements ButtonActionFileList {
 
     @Override
     public void doubleClick() {
-        mainController.hostFileList.getItems().clear();
-        mainController.hostFileList.getItems().addAll(getFiles(Paths.get(mainController.hostPath.getText())));
+        mainController.updateHostListView(Paths.get(mainController.hostPath.getText()));
         mainController.hostDir = Path.of(mainController.hostPath.getText());
     }
 
     @Override
     public void onBack() {
         if (!mainController.hostDir.equals(Paths.get(mainController.sourceRoot))) {
-            mainController.hostFileList.getItems().clear();
-            mainController.hostFileList.getItems().addAll(getFiles(mainController.hostDir.getParent()));
+            mainController.updateHostListView(mainController.hostDir.getParent());
             mainController.hostDir = mainController.hostDir.getParent();
             mainController.hostPath.setText(mainController.hostDir.toString());
         }

@@ -1,5 +1,7 @@
 package com.example.client;
 
+import com.example.client.controller.MainController;
+import com.example.client.model.ClientModel;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -13,6 +15,8 @@ import java.io.IOException;
 public class Client extends Application {
     @Override
     public void start(Stage stage) throws IOException {
+        ClientModel clientModel = new ClientModel();
+
         FXMLLoader fxmlLoader = new FXMLLoader(Client.class.getResource("hello-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 300);
         stage.setTitle("Client!");

@@ -54,6 +54,11 @@ public class ServerHandler extends SimpleChannelInboundHandler<MessageExchange> 
         System.out.println(message.getType());
 
         switch (message.getType()) {
+            case CREATE_NEW_FOLDER -> {
+                System.out.println(Commands.CREATE_NEW_FOLDER + "-->" + LocalTime.now());
+                createNewFolder(message);
+                sendFileList(ctx, userRootDir);
+            }
             case COPY_SERVER_FILE -> {
                 System.out.println(Commands.COPY_SERVER_FILE + "-->" + LocalTime.now());
                 copyFile(message);
@@ -115,6 +120,15 @@ public class ServerHandler extends SimpleChannelInboundHandler<MessageExchange> 
             }
         }
 
+    }
+
+    private void createNewFolder(MessageExchange message) {
+        try {
+            Path path = Paths.get(userRootDir + File.separator + message.getMessage());
+            Files.createDirectory(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void copyFile(MessageExchange message) {

@@ -14,6 +14,8 @@ public interface ButtonActionFileList {
     public String getSelectedItem();
     public void delete();
     public void copy();
+    public void createNewFolder(String name);
+    public void callNewFolderScreen();
 
 
 

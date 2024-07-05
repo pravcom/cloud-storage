@@ -1,12 +1,19 @@
 package com.example.client.controller;
 
+import com.example.client.Client;
+import com.example.client.window.NewFolderWindow;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
 import org.akhtyamov.files.PartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -66,6 +73,38 @@ public class HostController implements ButtonActionFileList {
             mainController.updateHostListView(mainController.hostDir);
         } catch (IOException e) {
             System.out.println(e.getMessage());
+        }
+    }
+
+    @Override
+    public void createNewFolder(String name) {
+        try {
+            Path path = Paths.get(mainController.hostDir.toString() + File.separator + name);
+            Files.createDirectory(path);
+            mainController.updateHostListView(mainController.hostDir);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void callNewFolderScreen() {
+        try {
+            Stage stage = new Stage();
+            URL fxmlLocation = Client.class.getResource("newFolderView.fxml");
+            FXMLLoader fxmlLoader = new FXMLLoader(fxmlLocation);
+            Scene scene = null;
+//        fxmlLoader.setController(new NewFolderController(mainController));
+//        fxmlLoader.setController(new NewFolderController());
+            Parent parent = fxmlLoader.load();
+            NewFolderController newFolderController = fxmlLoader.getController();
+            newFolderController.setMainController(mainController);
+            scene = new Scene(parent, 200, 100);
+            stage.setTitle("Folder name");
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

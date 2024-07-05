@@ -1,6 +1,7 @@
 package com.example.client.controller;
 
 import com.example.client.ClientNetwork;
+import com.example.client.model.ClientModel;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -38,6 +39,9 @@ public class MainController implements Initializable {
     public TextField serverPath;
     @FXML
     public ListView serverFileList;
+    @FXML
+    private javafx.scene.control.Button closeButton;
+
 
     public void sendCommand(ActionEvent actionEvent) {
         clientNetwork.sendCommand(commandField.getText());
@@ -190,4 +194,14 @@ public class MainController implements Initializable {
             throw new RuntimeException(e);
         }
     }
+    public void callFolderScreen() {
+        if(isSelected(hostFileList)) hostController.callNewFolderScreen();
+        if(isSelected(serverFileList)) serverController.callNewFolderScreen();
+    }
+
+    public void createNewFolder(String name) {
+        if(isSelected(hostFileList)) hostController.createNewFolder(name);
+        if(isSelected(serverFileList)) serverController.createNewFolder(name);
+    }
+
 }

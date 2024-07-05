@@ -44,6 +44,8 @@
             <Button text="Выгрузить" HBox.hgrow="ALWAYS" onAction="#uploadOnHost"/>
             <Button text="Удалить" HBox.hgrow="ALWAYS" onAction="#delete"/>
             <Button text="Копировать" HBox.hgrow="ALWAYS" onAction="#copy"/>
+            <Button text="Создать папку" HBox.hgrow="ALWAYS" onAction="#callFolderScreen"/>
+
         </VBox>
         <ListView fx:id="serverFileList" HBox.hgrow="ALWAYS" onMouseClicked="#enterToDirServer">
 

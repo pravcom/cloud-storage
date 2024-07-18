@@ -32,6 +32,8 @@ public class ClientInboundHandler extends SimpleChannelInboundHandler<MessageExc
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         System.out.println(channel.remoteAddress() + " Отключился");
         ctx.channel().close();
+        mainController.setActive(false);
+//        mainController.clearServerNames();
     }
 
     @Override
@@ -41,6 +43,7 @@ public class ClientInboundHandler extends SimpleChannelInboundHandler<MessageExc
         // отправляем клиенту список файлов на сервере
         mainController.getServerFileList();
         mainController.getServerDir();
+        mainController.setActive(true);
     }
 
     @Override

@@ -13,6 +13,9 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.client.controller.MainController">
     <MenuBar>
@@ -20,19 +23,26 @@
             <MenuItem text="Выход" onAction="#onExitAction"/>
         </Menu>
     </MenuBar>
-    <HBox>
+    <HBox spacing="20.0">
         <Button text="Подключиться" onAction="#connectServer"/>
+        <Label text="Статус:"></Label>
+        <Label fx:id="statusText" text="Нет подключения"></Label>
+        <ImageView fx:id="ImageStatus" fitHeight="15" fitWidth="15">
+            <image>
+                <Image fx:id="status" url="@status-inactive.png"></Image>
+            </image>
+        </ImageView>
     </HBox>
-    <HBox>
-        <TextField fx:id="commandField" HBox.hgrow="ALWAYS" promptText="Введите команду..." onAction="#sendCommand"/>
-        <Button text="Отправить" onAction="#sendCommand"/>
-    </HBox>
+<!--    <HBox>-->
+<!--        <TextField fx:id="commandField" HBox.hgrow="ALWAYS" promptText="Введите команду..." onAction="#sendCommand"/>-->
+<!--        <Button text="Отправить" onAction="#sendCommand"/>-->
+<!--    </HBox>-->
     <!--Путь к файлам-->
     <HBox>
         <TextField fx:id="hostPath" HBox.hgrow="ALWAYS"/>
         <Button text="Назад" HBox.hgrow="ALWAYS" onAction="#onBackHost"/>
-        <TextField fx:id="serverPath" HBox.hgrow="ALWAYS"/>
-        <Button text="Назад" alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS" onAction="#onBackServer"/>
+        <TextField fx:id="serverPath" HBox.hgrow="ALWAYS" disable="true"/>
+        <Button fx:id="BtnServerBack" text="Назад" alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS" onAction="#onBackServer" disable="true"/>
     </HBox>
     <!--Список файлов клиент сервер-->
     <HBox>
@@ -47,7 +57,7 @@
             <Button text="Создать папку" HBox.hgrow="ALWAYS" onAction="#callFolderScreen"/>
 
         </VBox>
-        <ListView fx:id="serverFileList" HBox.hgrow="ALWAYS" onMouseClicked="#enterToDirServer">
+        <ListView fx:id="serverFileList" HBox.hgrow="ALWAYS" onMouseClicked="#enterToDirServer" disable="true">
 
         </ListView>
     </HBox>

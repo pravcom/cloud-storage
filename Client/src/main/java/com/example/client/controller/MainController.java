@@ -1,23 +1,28 @@
 package com.example.client.controller;
 
 import com.example.client.ClientNetwork;
-import com.example.client.model.ClientModel;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import org.akhtyamov.Action;
 import org.akhtyamov.Commands;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.Cleaner;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -30,8 +35,6 @@ public class MainController implements Initializable {
     private HostController hostController;
     private ServerController serverController;
     @FXML
-    private TextField commandField;
-    @FXML
     public ListView<String> hostFileList;
     @FXML
     public TextField hostPath;
@@ -40,33 +43,31 @@ public class MainController implements Initializable {
     @FXML
     public ListView serverFileList;
     @FXML
-    private javafx.scene.control.Button closeButton;
-
-
-    public void sendCommand(ActionEvent actionEvent) {
-        clientNetwork.sendCommand(commandField.getText());
-        commandField.clear();
-        commandField.requestFocus();
-    }
-
+    private Label statusText;
+    @FXML
+    private ImageView ImageStatus;
+    @FXML
+    private Button BtnServerBack;
+    private final Image activeStatus = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/example/client/status-active.png")));
+    private final Image inactiveStatus = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/example/client/status-inactive.png")));
+    private boolean active;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        clientNetwork = new ClientNetwork();
         hostController = new HostController(this);
         serverController = new ServerController(this);
         hostController.initialize();
 
     }
 
-    public void onExitAction(ActionEvent actionEvent) {
+    public void onExitAction() {
         clientNetwork.close();
     }
 
     /**
      * Загрузка "Клиент --> Сервер"
-     *
-     * @param actionEvent
      */
-    public void uploadOnServer(ActionEvent actionEvent) {
+    public void uploadOnServer() {
         if (isSelected(hostFileList)) {
             hostController.upload();
         }
@@ -85,6 +86,7 @@ public class MainController implements Initializable {
         if (isSelected(hostFileList)) hostController.delete();
         if (isSelected(serverFileList)) serverController.delete();
     }
+
     public void copy(ActionEvent actionEvent) {
         if (isSelected(hostFileList)) hostController.copy();
         if (isSelected(serverFileList)) serverController.copy();
@@ -156,7 +158,39 @@ public class MainController implements Initializable {
      * @param actionEvent
      */
     public void connectServer(ActionEvent actionEvent) {
-        clientNetwork = new ClientNetwork(this);
+        if (active) {
+            clientNetwork.getChannel().disconnect();
+        } else{
+            clientNetwork.start(this);
+        }
+    }
+    private boolean checkConnection(){
+        boolean active = false;
+        if (clientNetwork.getChannel() == null) {
+            active = false;
+        } else if (clientNetwork.getChannel().isActive()) {
+            active = true;
+        }else if (clientNetwork.getChannel().isActive() == false){
+            active = false;
+        }
+        return active;
+    }
+    public void changeStatus(boolean active) {
+        Platform.runLater(()->{
+            if (active) {
+                statusText.setText("Подключено");
+                ImageStatus.setImage(activeStatus);
+                serverFileList.setDisable(false);
+                serverPath.setDisable(false);
+                BtnServerBack.setDisable(false);
+            } else {
+                statusText.setText("Не подключено");
+                ImageStatus.setImage(inactiveStatus);
+                serverFileList.setDisable(true);
+                serverPath.setDisable(true);
+                BtnServerBack.setDisable(true);
+            }
+        });
     }
 
     /**
@@ -181,8 +215,10 @@ public class MainController implements Initializable {
     }
 
     public void updateHostListView(Path path) {
-        hostFileList.getItems().clear();
-        hostFileList.getItems().addAll(getFiles(path));
+        Platform.runLater(()->{
+            hostFileList.getItems().clear();
+            hostFileList.getItems().addAll(getFiles(path));
+        });
     }
 
     static List<String> getFiles(Path path) {
@@ -194,14 +230,25 @@ public class MainController implements Initializable {
             throw new RuntimeException(e);
         }
     }
+
     public void callFolderScreen() {
-        if(isSelected(hostFileList)) hostController.callNewFolderScreen();
-        if(isSelected(serverFileList)) serverController.callNewFolderScreen();
+        if (isSelected(hostFileList)) hostController.callNewFolderScreen();
+        if (isSelected(serverFileList)) serverController.callNewFolderScreen();
     }
 
     public void createNewFolder(String name) {
-        if(isSelected(hostFileList)) hostController.createNewFolder(name);
-        if(isSelected(serverFileList)) serverController.createNewFolder(name);
+        if (isSelected(hostFileList)) hostController.createNewFolder(name);
+        if (isSelected(serverFileList)) serverController.createNewFolder(name);
     }
 
+    public void setActive(boolean active) {
+        this.active = active;
+
+        changeStatus(active);
+    }
+    public void clearServerNames(){
+        serverDir = null;
+        serverPath = null;
+        serverFileList = null;
+    }
 }

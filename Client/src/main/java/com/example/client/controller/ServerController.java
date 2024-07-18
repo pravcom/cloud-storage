@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 
-public class ServerController implements ButtonActionFileList{
+public class ServerController implements ButtonActionFileList {
     private final MainController mainController;
 
     public ServerController(MainController mainController) {
@@ -25,23 +25,27 @@ public class ServerController implements ButtonActionFileList{
 
     @Override
     public void upload() {
-        mainController.clientNetwork.getChannel().writeAndFlush(new Action(mainController.serverPath.getText(),Commands.UPLOAD_ON_HOST));
+        mainController.clientNetwork.getChannel().writeAndFlush(new Action(mainController.serverPath.getText(), Commands.UPLOAD_ON_HOST));
+        mainController.commandsList.appendText("Upload: " + mainController.serverPath.getText() + "\n");
     }
 
     @Override
     public void delete() {
         mainController.clientNetwork.getChannel()
-                .writeAndFlush(new Action(mainController.serverPath.getText(),Commands.DELETE_SERVER_FILE));
+                .writeAndFlush(new Action(mainController.serverPath.getText(), Commands.DELETE_SERVER_FILE));
+        mainController.commandsList.appendText("Delete: "+mainController.serverPath.getText()+"\n");
     }
 
     @Override
     public void copy() {
-        mainController.clientNetwork.getChannel().writeAndFlush(new Action(mainController.serverPath.getText(),Commands.COPY_SERVER_FILE));
+        mainController.clientNetwork.getChannel().writeAndFlush(new Action(mainController.serverPath.getText(), Commands.COPY_SERVER_FILE));
+        mainController.commandsList.appendText("Copy: " + mainController.serverPath.getText() + "\n");
     }
 
     @Override
     public void createNewFolder(String name) {
-        mainController.clientNetwork.getChannel().writeAndFlush(new Action(name,Commands.CREATE_NEW_FOLDER));
+        mainController.clientNetwork.getChannel().writeAndFlush(new Action(name, Commands.CREATE_NEW_FOLDER));
+        mainController.commandsList.appendText("Create new folder: " + name + "\n");
     }
 
     @Override

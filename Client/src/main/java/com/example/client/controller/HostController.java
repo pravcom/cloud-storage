@@ -2,12 +2,15 @@ package com.example.client.controller;
 
 import com.example.client.Client;
 import com.example.client.window.NewFolderWindow;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import org.akhtyamov.Commands;
 import org.akhtyamov.files.PartFile;
 
 import java.io.File;
@@ -22,6 +25,7 @@ import java.util.stream.Collectors;
 
 public class HostController implements ButtonActionFileList {
     private final MainController mainController;
+
 
     public HostController(MainController mainController) {
         this.mainController = mainController;
@@ -42,6 +46,7 @@ public class HostController implements ButtonActionFileList {
             //считываем буфер
             fis.read(buffer);
             mainController.clientNetwork.getChannel().writeAndFlush(new PartFile(buffer, getSelectedItem()));
+            mainController.commandsList.appendText("Upload: " + getSelectedItem() + "\n");
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
@@ -51,6 +56,7 @@ public class HostController implements ButtonActionFileList {
     public void delete() {
         Paths.get(mainController.hostPath.getText()).toFile().delete();
         mainController.updateHostListView(mainController.hostDir);
+        mainController.commandsList.appendText("Delete: " + mainController.hostPath.getText() + "\n");
     }
 
     @Override
@@ -71,6 +77,7 @@ public class HostController implements ButtonActionFileList {
 
             Files.copy(file, fileName);
             mainController.updateHostListView(mainController.hostDir);
+            mainController.commandsList.appendText("Copy: " + fileName + "\n");
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
@@ -82,6 +89,7 @@ public class HostController implements ButtonActionFileList {
             Path path = Paths.get(mainController.hostDir.toString() + File.separator + name);
             Files.createDirectory(path);
             mainController.updateHostListView(mainController.hostDir);
+            mainController.commandsList.appendText("Create new folder: " + name + "\n");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

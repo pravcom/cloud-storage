@@ -18,7 +18,7 @@ public class Client extends Application {
         ClientModel clientModel = new ClientModel();
 
         FXMLLoader fxmlLoader = new FXMLLoader(Client.class.getResource("hello-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 600, 300);
+        Scene scene = new Scene(fxmlLoader.load(), 600, 400);
         stage.setTitle("Client!");
         stage.setScene(scene);
         stage.show();

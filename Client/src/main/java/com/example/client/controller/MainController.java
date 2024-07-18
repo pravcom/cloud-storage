@@ -5,10 +5,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -51,6 +48,8 @@ public class MainController implements Initializable {
     private final Image activeStatus = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/example/client/status-active.png")));
     private final Image inactiveStatus = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/example/client/status-inactive.png")));
     private boolean active;
+    public TextArea commandsList;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         clientNetwork = new ClientNetwork();
@@ -64,22 +63,11 @@ public class MainController implements Initializable {
         clientNetwork.close();
     }
 
-    /**
-     * Загрузка "Клиент --> Сервер"
-     */
-    public void uploadOnServer() {
-        if (isSelected(hostFileList)) {
-            hostController.upload();
-        }
+    public void upload() {
 
-    }
+        if (isSelected(hostFileList)) hostController.upload();
+        if (isSelected(serverFileList)) serverController.upload();
 
-    /**
-     * Выгрузка "Сервер --> Клиент"
-     */
-    public void uploadOnHost() {
-        if (isSelected(serverFileList))
-            serverController.upload();
     }
 
     public void delete() {
@@ -139,15 +127,6 @@ public class MainController implements Initializable {
         clientNetwork.getChannel().writeAndFlush(new Action("", Commands.GET_FILE_LIST));
     }
 
-    /**
-     * Поток на запрос содержимого выделенной папки ( Проваливание в папку на сервере )
-     *
-     * @param filename название папки
-     */
-    public void getServerFileList(String filename) {
-        clientNetwork.getChannel().writeAndFlush(new Action(filename, Commands.GET_FILE_LIST));
-    }
-
     public void getServerDir() {
         clientNetwork.getChannel().writeAndFlush(new Action("", Commands.GET_SERVER_DIR_NAME));
     }
@@ -160,23 +139,13 @@ public class MainController implements Initializable {
     public void connectServer(ActionEvent actionEvent) {
         if (active) {
             clientNetwork.getChannel().disconnect();
-        } else{
+        } else {
             clientNetwork.start(this);
         }
     }
-    private boolean checkConnection(){
-        boolean active = false;
-        if (clientNetwork.getChannel() == null) {
-            active = false;
-        } else if (clientNetwork.getChannel().isActive()) {
-            active = true;
-        }else if (clientNetwork.getChannel().isActive() == false){
-            active = false;
-        }
-        return active;
-    }
+
     public void changeStatus(boolean active) {
-        Platform.runLater(()->{
+        Platform.runLater(() -> {
             if (active) {
                 statusText.setText("Подключено");
                 ImageStatus.setImage(activeStatus);
@@ -215,7 +184,7 @@ public class MainController implements Initializable {
     }
 
     public void updateHostListView(Path path) {
-        Platform.runLater(()->{
+        Platform.runLater(() -> {
             hostFileList.getItems().clear();
             hostFileList.getItems().addAll(getFiles(path));
         });
@@ -245,10 +214,5 @@ public class MainController implements Initializable {
         this.active = active;
 
         changeStatus(active);
-    }
-    public void clearServerNames(){
-        serverDir = null;
-        serverPath = null;
-        serverFileList = null;
     }
 }

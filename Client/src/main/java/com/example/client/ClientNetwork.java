@@ -60,7 +60,7 @@ public class ClientNetwork {
     }
 
     public void close() {
-        channel.close();
+        if(channel!= null) channel.close();
         Platform.exit();
     }
 }

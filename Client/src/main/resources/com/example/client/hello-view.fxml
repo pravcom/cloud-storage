@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.client.controller.MainController">
+    <MenuBar>
+        <Menu text="Программа">
+            <MenuItem text="Выход" onAction="#onExitAction"/>
+        </Menu>
+    </MenuBar>
+    <HBox spacing="20.0">
+        <Button text="Подключиться" onAction="#connectServer"/>
+        <Label text="Статус:"/>
+        <Label fx:id="statusText" text="Нет подключения"/>
+        <ImageView fx:id="ImageStatus" fitHeight="15" fitWidth="15">
+            <Image url="@status-inactive.png"/>
+        </ImageView>
+    </HBox>
+    <HBox>
+        <TextArea fx:id="commandsList" HBox.hgrow="ALWAYS" editable="false"/>
+    </HBox>
+    <!--Путь к файлам-->
+    <HBox>
+        <TextField fx:id="hostPath" HBox.hgrow="ALWAYS"/>
+        <Button text="Назад" HBox.hgrow="ALWAYS" onAction="#onBackHost"/>
+        <TextField fx:id="serverPath" HBox.hgrow="ALWAYS" disable="true"/>
+        <Button fx:id="BtnServerBack" text="Назад" alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS" onAction="#onBackServer" disable="true"/>
+    </HBox>
+    <!--Список файлов клиент сервер-->
+    <HBox>
+        <ListView fx:id="hostFileList" HBox.hgrow="ALWAYS" onMouseClicked="#enterToDir">
+
+        </ListView>
+        <VBox>
+            <Button text="Загрузить" HBox.hgrow="ALWAYS" onAction="#upload"/>
+            <Button text="Удалить" HBox.hgrow="ALWAYS" onAction="#delete"/>
+            <Button text="Копировать" HBox.hgrow="ALWAYS" onAction="#copy"/>
+            <Button text="Создать папку" HBox.hgrow="ALWAYS" onAction="#callFolderScreen"/>
+
+        </VBox>
+        <ListView fx:id="serverFileList" HBox.hgrow="ALWAYS" onMouseClicked="#enterToDirServer" disable="true">
+
+        </ListView>
+    </HBox>
+</VBox>

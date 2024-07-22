@@ -1,0 +1,14 @@
+package org.akhtyamov;
+
+public enum Commands {
+    DOWNLOAD,
+    LIST_FILE,
+    GET_FILE_LIST,
+    FILE,
+    GET_SERVER_DIR_NAME,
+    DOUBLE_CLICK_FILE,
+    GET_CURRENT_FILE,
+    BACK,
+    UPLOAD_ON_HOST, COPY_SERVER_FILE, CREATE_NEW_FOLDER, DELETE_SERVER_FILE
+
+}

@@ -9,7 +9,6 @@ import org.akhtyamov.MessageExchange;
 import org.akhtyamov.files.PartFile;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,14 +19,13 @@ import java.util.List;
 public class ClientInboundHandler extends SimpleChannelInboundHandler<MessageExchange> {
     private final MainController mainController;
     private Channel channel;
-    private FileInputStream fis;
 
     public ClientInboundHandler(MainController mainController) {
         this.mainController = mainController;
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+    public void channelInactive(ChannelHandlerContext ctx) {
         System.out.println(channel.remoteAddress() + " Отключился");
         ctx.channel().close();
         mainController.setActive(false);
@@ -35,7 +33,7 @@ public class ClientInboundHandler extends SimpleChannelInboundHandler<MessageExc
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+    public void channelActive(ChannelHandlerContext ctx) {
         System.out.println("Клиент подключился: " + ctx.channel().remoteAddress());
         channel = ctx.channel();
         // отправляем клиенту список файлов на сервере
@@ -45,19 +43,13 @@ public class ClientInboundHandler extends SimpleChannelInboundHandler<MessageExc
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, MessageExchange message) throws Exception {
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, MessageExchange message) {
         System.out.println("Сообщение пришло: " + message.getType());
 
         switch (message.getType()) {
-            case FILE -> {
-                getFileFromServer(message);
-            }
-            case LIST_FILE -> {
-                updateServerFileList(message);
-            }
-            case GET_SERVER_DIR_NAME -> {
-                getServerDirName(message);
-            }
+            case FILE -> getFileFromServer(message);
+            case LIST_FILE -> updateServerFileList(message);
+            case GET_SERVER_DIR_NAME -> getServerDirName(message);
             case GET_CURRENT_FILE -> {
                 mainController.currentFileOnServer = (File) message.getMessage();
                 mainController.doubleClickServer();
@@ -80,8 +72,6 @@ public class ClientInboundHandler extends SimpleChannelInboundHandler<MessageExc
 
     /**
      * Передаем контроллеру название директории сервера
-     *
-     * @param message
      */
     private void getServerDirName(MessageExchange message) {
         mainController.setServerDirName((Paths.get((String) message.getMessage())));

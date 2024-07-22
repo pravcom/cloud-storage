@@ -6,9 +6,6 @@ import org.akhtyamov.MessageExchange;
 public class PartFile implements MessageExchange {
 
     private final byte[] message;
-//    private final long startPos;
-//    private final long endPos;
-//    private final boolean isLast;
     private final String filename;
 
     public PartFile(byte[] message, String filename) {

@@ -1,21 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
-
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.TreeView?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
 <VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.client.controller.MainController">
     <MenuBar>
@@ -25,16 +13,14 @@
     </MenuBar>
     <HBox spacing="20.0">
         <Button text="Подключиться" onAction="#connectServer"/>
-        <Label text="Статус:"></Label>
-        <Label fx:id="statusText" text="Нет подключения"></Label>
+        <Label text="Статус:"/>
+        <Label fx:id="statusText" text="Нет подключения"/>
         <ImageView fx:id="ImageStatus" fitHeight="15" fitWidth="15">
-            <image>
-                <Image fx:id="status" url="@status-inactive.png"></Image>
-            </image>
+            <Image url="@status-inactive.png"/>
         </ImageView>
     </HBox>
     <HBox>
-        <TextArea fx:id="commandsList" HBox.hgrow="ALWAYS" editable="false"></TextArea>
+        <TextArea fx:id="commandsList" HBox.hgrow="ALWAYS" editable="false"/>
     </HBox>
     <!--Путь к файлам-->
     <HBox>

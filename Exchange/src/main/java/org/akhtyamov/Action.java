@@ -2,7 +2,7 @@ package org.akhtyamov;
 
 public class Action implements MessageExchange{
     private final String filePath;
-    private Commands command;
+    private final Commands command;
 
     public Action(String filePath, Commands command) {
         this.filePath = filePath;

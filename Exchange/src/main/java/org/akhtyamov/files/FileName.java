@@ -6,7 +6,7 @@ import org.akhtyamov.MessageExchange;
 import java.io.File;
 
 public class FileName implements MessageExchange {
-    private File message;
+    private final File message;
     @Override
     public Commands getType() {
         return Commands.GET_CURRENT_FILE;

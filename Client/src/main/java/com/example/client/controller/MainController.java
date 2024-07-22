@@ -2,7 +2,6 @@ package com.example.client.controller;
 
 import com.example.client.ClientNetwork;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -14,7 +13,6 @@ import org.akhtyamov.Commands;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.ref.Cleaner;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -62,7 +60,6 @@ public class MainController implements Initializable {
     public void onExitAction() {
         clientNetwork.close();
     }
-
     public void upload() {
 
         if (isSelected(hostFileList)) hostController.upload();
@@ -75,15 +72,13 @@ public class MainController implements Initializable {
         if (isSelected(serverFileList)) serverController.delete();
     }
 
-    public void copy(ActionEvent actionEvent) {
+    public void copy() {
         if (isSelected(hostFileList)) hostController.copy();
         if (isSelected(serverFileList)) serverController.copy();
     }
 
     /**
      * Событие по щелчку на списке файлов клиента
-     *
-     * @param mouseEvent
      */
     public void enterToDir(MouseEvent mouseEvent) {
         hostController.enterToDir(mouseEvent);
@@ -91,17 +86,13 @@ public class MainController implements Initializable {
 
     /**
      * Кнопка "Назад" хост
-     *
-     * @param actionEvent
      */
-    public void onBackHost(ActionEvent actionEvent) {
+    public void onBackHost() {
         hostController.onBack();
     }
 
     /**
      * Событие по щелчку на списке файлов сервера
-     *
-     * @param mouseEvent
      */
     public void enterToDirServer(MouseEvent mouseEvent) {
         serverController.enterToDir(mouseEvent);
@@ -113,10 +104,8 @@ public class MainController implements Initializable {
 
     /**
      * Кнопка "Назад" для сервера
-     *
-     * @param actionEvent
      */
-    public void onBackServer(ActionEvent actionEvent) {
+    public void onBackServer() {
         serverController.onBack();
     }
 
@@ -133,10 +122,8 @@ public class MainController implements Initializable {
 
     /**
      * Подключение к серверу
-     *
-     * @param actionEvent
      */
-    public void connectServer(ActionEvent actionEvent) {
+    public void connectServer() {
         if (active) {
             clientNetwork.getChannel().disconnect();
         } else {
@@ -164,8 +151,6 @@ public class MainController implements Initializable {
 
     /**
      * Устанавливаем название корневой директории сервера
-     *
-     * @param serverDirPath
      */
     public void setServerDirName(Path serverDirPath) {
         serverController.setDirName(serverDirPath);

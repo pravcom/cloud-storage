@@ -26,23 +26,22 @@ import java.util.stream.Collectors;
 public class ServerHandler extends SimpleChannelInboundHandler<MessageExchange> {
     public static final String sourceRoot = "server/server";
     private Path userRootDir;
-    private File currentDir;
     private Channel channel;
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+    public void channelActive(ChannelHandlerContext ctx) {
         System.out.println("Client connected: " + ctx.channel().remoteAddress());
         userRootDir = Paths.get("server/server");
         channel = ctx.channel();
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+    public void channelInactive(ChannelHandlerContext ctx) {
         System.out.println("Client disconnected: " + ctx.channel().remoteAddress());
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         // Обработка других типов исключений
         // Например, отправка общего сообщения об ошибке или закрытие соединения
         ctx.writeAndFlush("An error occurred: " + cause.getMessage() + "\n");
@@ -50,7 +49,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<MessageExchange> 
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, MessageExchange message) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, MessageExchange message) {
         System.out.println(message.getType());
 
         switch (message.getType()) {
@@ -67,9 +66,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<MessageExchange> 
             case DOWNLOAD -> {
 
             }
-            case UPLOAD_ON_HOST -> {
-                uploadOnHost(message);
-            }
+            case UPLOAD_ON_HOST -> uploadOnHost(message);
             case FILE -> {
                 PartFile partFile = (PartFile) message;
                 Path path = Path.of(userRootDir + File.separator + partFile.getFilename());
@@ -174,10 +171,6 @@ public class ServerHandler extends SimpleChannelInboundHandler<MessageExchange> 
 
     /**
      * Отправляем иницилизирующий список файлов сервера клиенту
-     *
-     * @param ctx
-     * @param currentDir
-     * @param
      */
     private void sendFileList(ChannelHandlerContext ctx, Path currentDir) {
         try {

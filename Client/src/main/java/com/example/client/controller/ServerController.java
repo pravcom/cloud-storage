@@ -3,9 +3,6 @@ package com.example.client.controller;
 import com.example.client.Client;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import org.akhtyamov.Action;
@@ -54,14 +51,7 @@ public class ServerController implements ButtonActionFileList {
             Stage stage = new Stage();
             URL fxmlLocation = Client.class.getResource("newFolderView.fxml");
             FXMLLoader fxmlLoader = new FXMLLoader(fxmlLocation);
-            Scene scene = null;
-            Parent parent = fxmlLoader.load();
-            NewFolderController newFolderController = fxmlLoader.getController();
-            newFolderController.setMainController(mainController);
-            scene = new Scene(parent, 200, 100);
-            stage.setTitle("Folder name");
-            stage.setScene(scene);
-            stage.show();
+            NewFolderController.newFolderWindow(stage, fxmlLoader, mainController);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -98,8 +88,6 @@ public class ServerController implements ButtonActionFileList {
 
     public void setDirName(Path serverDirPath) {
         mainController.serverDir = serverDirPath;
-        Platform.runLater(() -> {
-            mainController.serverPath.setText(mainController.serverDir.toString());
-        });
+        Platform.runLater(() -> mainController.serverPath.setText(mainController.serverDir.toString()));
     }
 }

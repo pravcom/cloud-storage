@@ -1,16 +1,9 @@
 package com.example.client.controller;
 
 import com.example.client.Client;
-import com.example.client.window.NewFolderWindow;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-import org.akhtyamov.Commands;
 import org.akhtyamov.files.PartFile;
 
 import java.io.File;
@@ -20,21 +13,16 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class HostController implements ButtonActionFileList {
     private final MainController mainController;
-
-
     public HostController(MainController mainController) {
         this.mainController = mainController;
     }
 
     public void initialize() {
-        mainController.hostDir = Paths.get(mainController.sourceRoot);
+        mainController.hostDir = Paths.get(MainController.sourceRoot);
         mainController.updateHostListView(mainController.hostDir);
-//        mainController.hostFileList.getItems().addAll(getFiles(mainController.hostDir));
         mainController.hostPath.setText(mainController.hostDir.toString());
     }
 
@@ -63,7 +51,7 @@ public class HostController implements ButtonActionFileList {
     public void copy() {
         Path file = Paths.get(mainController.hostPath.getText());
         try {
-            Integer count = 0;
+            int count = 0;
             Path fileName = Paths.get(mainController.hostPath.getText());
 
             while (Files.exists(fileName)) {
@@ -101,21 +89,11 @@ public class HostController implements ButtonActionFileList {
             Stage stage = new Stage();
             URL fxmlLocation = Client.class.getResource("newFolderView.fxml");
             FXMLLoader fxmlLoader = new FXMLLoader(fxmlLocation);
-            Scene scene = null;
-//        fxmlLoader.setController(new NewFolderController(mainController));
-//        fxmlLoader.setController(new NewFolderController());
-            Parent parent = fxmlLoader.load();
-            NewFolderController newFolderController = fxmlLoader.getController();
-            newFolderController.setMainController(mainController);
-            scene = new Scene(parent, 200, 100);
-            stage.setTitle("Folder name");
-            stage.setScene(scene);
-            stage.show();
+            NewFolderController.newFolderWindow(stage, fxmlLoader, mainController);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-
 
     @Override
     public void enterToDir(MouseEvent mouseEvent) {
@@ -137,7 +115,7 @@ public class HostController implements ButtonActionFileList {
 
     @Override
     public void onBack() {
-        if (!mainController.hostDir.equals(Paths.get(mainController.sourceRoot))) {
+        if (!mainController.hostDir.equals(Paths.get(MainController.sourceRoot))) {
             mainController.updateHostListView(mainController.hostDir.getParent());
             mainController.hostDir = mainController.hostDir.getParent();
             mainController.hostPath.setText(mainController.hostDir.toString());

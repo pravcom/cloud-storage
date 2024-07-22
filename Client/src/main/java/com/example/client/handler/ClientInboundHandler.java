@@ -1,6 +1,5 @@
 package com.example.client.handler;
 
-import com.example.client.Callback;
 import com.example.client.controller.MainController;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -20,7 +19,6 @@ import java.util.List;
 
 public class ClientInboundHandler extends SimpleChannelInboundHandler<MessageExchange> {
     private final MainController mainController;
-    private Callback onMessageReceivedCallback;
     private Channel channel;
     private FileInputStream fis;
 
